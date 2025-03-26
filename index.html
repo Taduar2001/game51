@@ -54,6 +54,7 @@
 
             // Отправляем данные в Unity
             if (event.data.action === "updateScore") {
+                console.log("Data: "+unityInstanceMy)
                 unityInstanceMy.SendMessage("GameManager", "UpdateScore", event.data.value);
             }
         });
