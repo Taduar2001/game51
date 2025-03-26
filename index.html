@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="./style.css">
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+
     <style>
         /* Убираем выделение по нажатию клавиш */
         canvas:focus {
@@ -14,10 +15,8 @@
         }
 
         html, body {
-            /* Убираем отступы */
             padding: 0;
             margin: 0;
-            /* Отключаем скролл и лонгтап на IOS */
             overflow: hidden;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -26,7 +25,6 @@
             -ms-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: rgba(0,0,0,0);
-            /* Ставим высоту на 100% */
             height: 100%;
         }
     </style>
@@ -44,36 +42,33 @@
             <div class="spinner"></div>
         </div>
     </div>
+
     <script>
         var unityInstanceMy = null;
-        console.log("InitJS");
-        window.addEventListener("message", function (event) {
-            console.log("mb2");
 
+        // Обработка сообщений от родительского сайта (iframe)
+        window.addEventListener("message", function (event) {
             console.log("Получены данные:", event.data);
 
-            // Отправляем данные в Unity
+            if (!unityInstanceMy) {
+                console.warn("Unity еще не загружен!");
+                return;
+            }
+
             if (event.data.action === "updateScore") {
-                console.log("Data: "+unityInstanceMy)
+                console.log("Отправка в Unity: UpdateScore =", event.data.value);
                 unityInstanceMy.SendMessage("GameManager", "UpdateScore", event.data.value);
             }
         });
-    </script>
-    <script>
+
         vkBridge.send("VKWebAppInit", {});
+
         const container = document.querySelector("#unity-container");
         const canvas = document.querySelector("#unity-canvas");
         const loadingCover = document.querySelector("#loading-cover");
         const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
         const progressBarFull = document.querySelector("#unity-progress-bar-full");
         const spinner = document.querySelector('.spinner');
-
-        // Shows a temporary message banner/ribbon for a few seconds, or
-        // a permanent error message on top of the canvas if type=='error'.
-        // If type=='warning', a yellow highlight color is used.
-        // Modify or remove this function to customize the visually presented
-        // way that non-critical warnings and error messages are presented to the
-        // user.
 
         var buildUrl = "Build";
         var loaderUrl = buildUrl + "/Overtime.loader.js";
@@ -87,23 +82,13 @@
             productVersion: "0.1",
         };
 
-        // By default, Unity keeps WebGL canvas render target size matched with
-        // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-        // Set this to false if you want to decouple this synchronization from
-        // happening inside the engine, and you would instead like to size up
-        // the canvas DOM size and WebGL render target sizes yourself.
-        // config.matchWebGLToCanvasSize = false;
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             container.className = "unity-mobile";
-
-            //config.devicePixelRatio = 1;
         }
 
-        // Фоновое изображение при загрузке игры. При сборке билда код меняется взависимости от настроек проекта.
         loadingCover.style.background = "url('background.jpg') center / cover";
         loadingCover.style.display = "";
 
-        // Выключаем появление меню при правом клике мыши
         document.addEventListener('contextmenu', event => event.preventDefault());
 
         function FocusGame() {
@@ -111,13 +96,8 @@
             canvas.focus();
         }
 
-        window.addEventListener('pointerdown', () => {
-            FocusGame();
-        });
-        window.addEventListener('touchstart', () => {
-            FocusGame();
-        });
-
+        window.addEventListener('pointerdown', FocusGame);
+        window.addEventListener('touchstart', FocusGame);
 
         var script = document.createElement("script");
         script.src = loaderUrl;
@@ -129,13 +109,13 @@
             }).then((unityInstance) => {
                 unityInstanceMy = unityInstance;
                 loadingCover.style.display = "none";
+                console.log("Unity загружен!");
             }).catch((message) => {
-                alert(message);
+                console.error("Ошибка загрузки Unity:", message);
             });
         };
 
         document.body.appendChild(script);
-
     </script>
 </body>
 </html>
