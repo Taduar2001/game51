@@ -45,6 +45,7 @@
         </div>
     </div>
     <script>
+        var unityInstanceMy = null;
         console.log("InitJS");
         window.addEventListener("message", function (event) {
             console.log("mb2");
@@ -126,6 +127,7 @@
                 progressBarEmpty.style.display = "";
                 progressBarFull.style.width = `${100 * progress}%`;
             }).then((unityInstance) => {
+                unityInstanceMy = unityInstance;
                 loadingCover.style.display = "none";
             }).catch((message) => {
                 alert(message);
