@@ -45,7 +45,9 @@
         </div>
     </div>
     <script>
+        console.log("InitJS");
         window.addEventListener("message", function (event) {
+            console.log("mb2");
             if (event.origin !== "https://example.com") return; // Защита от XSS
 
             console.log("Получены данные:", event.data);
