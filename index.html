@@ -57,7 +57,7 @@
 
             if (event.data.action === "updateScore") {
                 console.log("Отправка в Unity: UpdateScore =", event.data.value);
-                unityInstanceMy.SendMessage("GameManager", "UpdateScore", event.data.value);
+                unityInstanceMy.SendMessage("GameManager", "UpdateScore", "hi");
             }
         });
 
